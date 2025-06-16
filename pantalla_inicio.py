@@ -1,5 +1,6 @@
 import pygame as pg
 import sys
+import punto_a
 
 # Inicializar Pygame
 pg.init()
@@ -11,36 +12,79 @@ pantalla = pg.display.set_mode((ANCHO, ALTO))
 pg.display.set_caption("Pantalla de Inicio")
 
 # Colores
-BLANCO = (255, 255, 255)
+BLANCO = (255, 255, 255) 
 GRIS = (200, 200, 200)
 NEGRO = (0, 0, 0)
-
-# Fuente
-fuente = pg.font.Font("C:/Users/Maite Conde/Desktop/Python/2° CUATRIMESTRE/segundo parcial/ka1.ttf", 30)
+CELESTE= (135, 206, 235)
+# Fuentes
+tamano_fuente_normal = 30
+tamano_fuente_grande = 40  # Texto más grande para el hover
+fuente_normal = pg.font.Font("C:/Users/kumae/Desktop/Segundo_parcial-main/ka1.ttf", tamano_fuente_normal)
+fuente_grande = pg.font.Font("C:/Users/kumae/Desktop/Segundo_parcial-main/ka1.ttf", tamano_fuente_grande)
 
 # Música de fondo
-pg.mixer.music.load("C:/Users/Maite Conde/Desktop/Python/2° CUATRIMESTRE/segundo parcial/Piratas del  caribe  cancion completa - android juegos.mp3")
-pg.mixer.music.play(-1)  # -1 = repetir infinitamente
+pg.mixer.music.load("C:/Users/kumae/Desktop/Segundo_parcial-main/Piratas del  caribe  cancion completa - android juegos.mp3")
+pg.mixer.music.play(-1)
 pg.mixer.music.set_volume(0.4)
 
 # Cargar imagen de fondo
-fondo = pg.image.load("C:/Users/Maite Conde/Desktop/Python/2° CUATRIMESTRE/segundo parcial/SEA_BATTLE.PNG")
+fondo = pg.image.load("C:/Users/kumae/Desktop/Segundo_parcial-main/SEA_BATTLE.PNG")
 fondo = pg.transform.scale(fondo, (ANCHO, ALTO))
 
-# Botones: texto, rectángulo
-botones = {
-    "Level": pg.Rect(300, 150, 200, 50),
-    "Play": pg.Rect(300, 230, 200, 50),
-    "Scores": pg.Rect(300, 310, 200, 50),
-    "Exit": pg.Rect(300, 390, 200, 50)
+# Tamaños de botones (rectangulares)
+TAMANO_NORMAL = (200, 50)
+TAMANO_GRANDE = (250, 70)  # Tamaño aumentado
+
+# Posiciones originales de los botones
+posiciones_botones = {
+    "Level": (300, 150),
+    "Play": (300, 230),
+    "Scores": (300, 310),
+    "Exit": (300, 390)
 }
 
-def dibujar_botones():
+# Diccionario para guardar los rectángulos actuales
+botones = {}
+def dibujar_cuadricula():
+    FILAS, COLUMNAS = 10, 10
+    TAM_CELDA = 40
+    margen_x = (ANCHO - (COLUMNAS * TAM_CELDA)) // 2
+    margen_y = (ALTO - (FILAS * TAM_CELDA)) // 2
+    for x in range(COLUMNAS + 1):
+        pg.draw.line(pantalla, NEGRO, (margen_x + x * TAM_CELDA, margen_y), (margen_x + x * TAM_CELDA, margen_y + FILAS * TAM_CELDA))
+    for y in range(FILAS + 1):
+        pg.draw.line(pantalla, NEGRO, (margen_x, margen_y + y * TAM_CELDA), (margen_x + COLUMNAS * TAM_CELDA, margen_y + y * TAM_CELDA))
+def actualizar_botones(boton_hover=None):
+    """Actualiza el tamaño de los botones según el hover"""
+    for texto, (x, y) in posiciones_botones.items():
+        if texto == boton_hover:
+            # Tamaño aumentado (centrado)
+            botones[texto] = pg.Rect(
+                x - (TAMANO_GRANDE[0] - TAMANO_NORMAL[0]) // 2,
+                y - (TAMANO_GRANDE[1] - TAMANO_NORMAL[1]) // 2,
+                TAMANO_GRANDE[0], TAMANO_GRANDE[1])
+        else:
+            # Tamaño normal
+            botones[texto] = pg.Rect(x, y, TAMANO_NORMAL[0], TAMANO_NORMAL[1])
+
+def dibujar_botones(boton_hover=None):
+    """Dibuja los botones rectangulares con texto que crece"""
     for texto, rect in botones.items():
+        # Dibujar rectángulo
         pg.draw.rect(pantalla, GRIS, rect)
+        
+        # Seleccionar fuente según hover
+        fuente = fuente_grande if texto == boton_hover else fuente_normal
         texto_render = fuente.render(texto, True, NEGRO)
-        texto_rect = texto_render.get_rect(center = rect.center)
+        texto_rect = texto_render.get_rect(center=rect.center)
         pantalla.blit(texto_render, texto_rect)
+
+def detectar_hover(pos):
+    """Detecta qué botón está bajo el cursor"""
+    for texto, rect in botones.items():
+        if rect.collidepoint(pos):
+            return texto
+    return None
 
 def detectar_click(pos):
     for texto, rect in botones.items():
@@ -48,26 +92,38 @@ def detectar_click(pos):
             return texto
     return None
 
+# Inicializar botones con tamaño normal
+actualizar_botones()
+
 # Bucle principal
 corriendo = True
+estado="menu"
 while corriendo:
-    pantalla.blit(fondo, (0, 0))
-    dibujar_botones()
-    pg.display.flip()
-
+    pos_mouse = pg.mouse.get_pos()
+    boton_hover = detectar_hover(pos_mouse)
+    
+         
     for evento in pg.event.get():
         if evento.type == pg.QUIT:
             corriendo = False
-        elif evento.type == pg.MOUSEBUTTONDOWN:
+        elif evento.type == pg.MOUSEBUTTONDOWN and estado == "menu":
             clic = detectar_click(evento.pos)
             if clic == "Exit":
                 corriendo = False
             elif clic == "Play":
+                estado= "game"
                 print("Starting game...")
             elif clic == "Level":
                 print("Selecting level...")
             elif clic == "Scores":
                 print("Showing scores...")
-
+    if estado=="menu":     
+        pantalla.blit(fondo, (0, 0))
+        actualizar_botones(boton_hover)
+        dibujar_botones(boton_hover)
+    elif estado == "game":
+        pantalla.fill(CELESTE)
+        dibujar_cuadricula()
+    pg.display.flip()
 pg.quit()
 sys.exit()
