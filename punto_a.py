@@ -38,73 +38,59 @@ def mostrar_matriz(matriz:list) -> None:
             print(matriz[i][j], end = "  ")
         print("")
 
-def verifica_posicion_barco(tablero, fila, columna, eleccion, orientacion):
-    valido = True
-    if orientacion == "horizontal":
-        if columna > len(tablero[0]) - eleccion:
-            valido = False
-        for i in range(eleccion):
-            if tablero[fila][columna + i] != 0:
-                valido = False
-    else:
-        if fila > len(tablero) - eleccion:
-            valido = False
-        for i in range(eleccion):
-            if tablero[fila + i][columna] != 0:
-                valido = False
-    return valido
-
-
 def verifica_posicion_barco(tablero, fila, columna, tamaño, orientacion):
+    puede_colocar = True
     if orientacion == "horizontal":
         if columna + tamaño > len(tablero[0]):
-            return False
-        for i in range(tamaño):
-            if tablero[fila][columna + i] != 0:
-                return False
-    else:  # vertical
+            puede_colocar = False
+        else:
+            for i in range(tamaño):
+                if tablero[fila][columna + i] != 0:
+                    puede_colocar = False
+                    break
+    else:
         if fila + tamaño > len(tablero):
-            return False
-        for i in range(tamaño):
-            if tablero[fila + i][columna] != 0:
-                return False
-    return True
+            puede_colocar = False
+        else:
+            for i in range(tamaño):
+                if tablero[fila + i][columna] != 0:
+                    puede_colocar = False
+                    break
+    return puede_colocar
+
+def colocar_barcos(tablero, lista_tamaños,barcos_info):
+    for tamaño in lista_tamaños:
+        colocado = False
+        while not colocado:
+            orientacion = random.choice(["horizontal", "vertical"])
+            fila = random.randint(0, len(tablero) - 1)
+            columna = random.randint(0, len(tablero[0]) - 1)
+            if verifica_posicion_barco(tablero, fila, columna, tamaño, orientacion):
+                posiciones = []
+                for i in range(tamaño):
+                    if orientacion == "horizontal":
+                        tablero[fila][columna + i] = 1
+                        posiciones.append((fila, columna + i))
+                    else:
+                        tablero[fila + i][columna] = 1
+                        posiciones.append((fila + i, columna))
+                barcos_info.append({"tamaño": tamaño, "posiciones": posiciones})
+                colocado = True
+    return barcos_info
+
+
+
 
 tablero = inicializar_matriz(10,10,0)
 barcos = [1,1,1,1,2,2,2,3,3,4]
+barcos_info = []
 
-for j in range(len(barcos)):
-    eleccion = random.choice(barcos) 
-    barcos.remove(eleccion)
-    orientacion = random.choice(["horizontal","vertical"])
-    fila = random.randint(0,(len(tablero) - 1))
-    columna = random.randint(0, len(tablero[0]) - 1)
-
-    while verifica_posicion_barco(tablero,fila,columna,eleccion,orientacion) == False:
-        fila = random.randint(0,(len(tablero) - 1))
-        columna = random.randint(0, len(tablero[0]) - 1)   
-
-    if orientacion == "horizontal":
-        if columna > len(tablero[0]) - eleccion:
-            columna = len(tablero[0]) - eleccion
-        for i in range(eleccion):
-            tablero[fila][columna + i] = 1
-    else:
-        if fila > len(tablero) - eleccion:
-            fila = len(tablero) - eleccion
-        for i in range(eleccion):
-            tablero[fila + i][columna] = 1
-
-    for choice in range(eleccion):
-        for i in range(eleccion):
-            if orientacion == "horizontal":
-                tablero[fila][columna + i] = 1
-            else:
-                tablero[fila + i][columna] = 1
+colocar_barcos(tablero, barcos,barcos_info)
   
     
 
 mostrar_matriz(tablero)
+print(barcos_info)
     
 
 
