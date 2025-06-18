@@ -25,7 +25,7 @@ fuente_grande = pg.font.Font("ka1.ttf", tamano_fuente_grande)
 # Música de fondo
 pg.mixer.music.load("Piratas del  caribe  cancion completa - android juegos.mp3")
 pg.mixer.music.play(-1)
-pg.mixer.music.set_volume(0.4)
+pg.mixer.music.set_volume(0.2)
 
 # Cargar imagen de fondo
 fondo = pg.image.load("SEA_BATTLE.PNG")
@@ -43,7 +43,8 @@ posiciones_botones = {
     "Level": (300, 150),
     "Play": (300, 230),
     "Scores": (300, 310),
-    "Exit": (300, 390)
+    "Exit": (300, 390),
+    "Mute" : (50, 30),
 }
 
 
@@ -69,16 +70,33 @@ def actualizar_botones(boton_hover=None):
         else:
             # Tamaño normal
             botones[texto] = pg.Rect(x, y, TAMANO_NORMAL[0], TAMANO_NORMAL[1])
-
 def dibujar_botones(boton_hover=None):
     """Dibuja los botones rectangulares con texto que crece"""
     for texto, rect in botones.items():
         # Dibujar rectángulo
-        pg.draw.rect(pantalla, GRIS, rect)
-        
+        color_del_boton= GRIS
+        if texto == "Mute":
+            if muteado:
+                mostrar_texto = "Unmute"
+                color_del_boton= (220,50,50)
+            else:
+                mostrar_texto = "Mute"
+        else:
+            mostrar_texto = texto
+        if texto == boton_hover:
+            fuente = fuente_grande
+        else:
+            fuente = fuente_normal
+        pg.draw.rect(pantalla, color_del_boton, rect, border_radius= 25)
+        if texto == "Mute" and muteado:
+            pg.draw.line(
+                pantalla, NEGRO,
+                (rect.right - 10, rect.top + 10),
+                (rect.left + 10, rect.bottom - 10),
+                3
+            )
         # Seleccionar fuente según hover
-        fuente = fuente_grande if texto == boton_hover else fuente_normal
-        texto_render = fuente.render(texto, True, NEGRO)
+        texto_render = fuente.render(mostrar_texto, True, NEGRO)
         texto_rect = texto_render.get_rect(center=rect.center)
         pantalla.blit(texto_render, texto_rect)
 def es_barco_hundido(barcos_info, disparos, fila, col):
@@ -132,7 +150,7 @@ def dibujar_cuadricula():
 
 # Inicializar botones con tamaño normal
 actualizar_botones()
-
+muteado = False
 # Bucle principal
 corriendo = True
 estado="menu"
@@ -161,6 +179,14 @@ while corriendo:
                 print("Selecting level...")
             elif clic == "Scores":
                 print("Showing scores...")
+            elif clic == "Mute" or clic == "Unmute":
+                muteado = not muteado
+                if muteado:
+                    pg.mixer.music.pause()
+                    print("Music muted")
+                else:
+                    pg.mixer.music.unpause()
+                    print("Music unmuted")
         elif evento.type == pg.MOUSEBUTTONDOWN and estado == "game":
             fila_col = obtener_celda_clic(*evento.pos)
             if fila_col:
@@ -173,10 +199,10 @@ while corriendo:
                         else:
                             print("Tocado")
                         
-                        puntaje+= 5 
+                        puntaje += 5 
                     elif tablero[fila_col[0]][fila_col[1]] == 0 and disparos[fila_col[0]][fila_col[1]] == 0:
                         print("Agua")
-                        puntaje-= 1
+                        puntaje -= 1
                         disparos[fila_col[0]][fila_col[1]] = 3
     if estado=="menu":     
         pantalla.blit(fondo, (0, 0))
