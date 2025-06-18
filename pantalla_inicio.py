@@ -19,21 +19,24 @@ CELESTE= (135, 206, 235)
 # Fuentes
 tamano_fuente_normal = 30
 tamano_fuente_grande = 40  # Texto más grande para el hover
-fuente_normal = pg.font.Font("C:/Users/kumae/Desktop/Segundo_parcial-main/ka1.ttf", tamano_fuente_normal)
-fuente_grande = pg.font.Font("C:/Users/kumae/Desktop/Segundo_parcial-main/ka1.ttf", tamano_fuente_grande)
+fuente_normal = pg.font.Font("ka1.ttf", tamano_fuente_normal)
+fuente_grande = pg.font.Font("ka1.ttf", tamano_fuente_grande)
 
 # Música de fondo
-pg.mixer.music.load("C:/Users/kumae/Desktop/Segundo_parcial-main/Piratas del  caribe  cancion completa - android juegos.mp3")
+pg.mixer.music.load("Piratas del  caribe  cancion completa - android juegos.mp3")
 pg.mixer.music.play(-1)
 pg.mixer.music.set_volume(0.4)
 
 # Cargar imagen de fondo
-fondo = pg.image.load("C:/Users/kumae/Desktop/Segundo_parcial-main/SEA_BATTLE.PNG")
+fondo = pg.image.load("SEA_BATTLE.PNG")
 fondo = pg.transform.scale(fondo, (ANCHO, ALTO))
 
 # Tamaños de botones (rectangulares)
 TAMANO_NORMAL = (200, 50)
 TAMANO_GRANDE = (250, 70)  # Tamaño aumentado
+FILAS=10
+COLUMNAS=10
+TAM_CELDA=40
 
 # Posiciones originales de los botones
 posiciones_botones = {
@@ -43,17 +46,17 @@ posiciones_botones = {
     "Exit": (300, 390)
 }
 
+
 # Diccionario para guardar los rectángulos actuales
 botones = {}
-def dibujar_cuadricula():
-    FILAS, COLUMNAS = 10, 10
-    TAM_CELDA = 40
-    margen_x = (ANCHO - (COLUMNAS * TAM_CELDA)) // 2
-    margen_y = (ALTO - (FILAS * TAM_CELDA)) // 2
-    for x in range(COLUMNAS + 1):
-        pg.draw.line(pantalla, NEGRO, (margen_x + x * TAM_CELDA, margen_y), (margen_x + x * TAM_CELDA, margen_y + FILAS * TAM_CELDA))
-    for y in range(FILAS + 1):
-        pg.draw.line(pantalla, NEGRO, (margen_x, margen_y + y * TAM_CELDA), (margen_x + COLUMNAS * TAM_CELDA, margen_y + y * TAM_CELDA))
+def dibujar_matriz(filas, columnas, TAM_CELDA,Ancho, Alto):
+    margen_x = (Ancho - (columnas * TAM_CELDA)) // 2
+    margen_y = (Alto - (filas * TAM_CELDA)) // 2
+    for x in range(columnas + 1):
+        pg.draw.line(pantalla, NEGRO, (margen_x + x * TAM_CELDA, margen_y), (margen_x + x * TAM_CELDA, margen_y + filas * TAM_CELDA))
+    for y in range(filas + 1):
+        pg.draw.line(pantalla, NEGRO, (margen_x, margen_y + y * TAM_CELDA), (margen_x + columnas * TAM_CELDA, margen_y + y * TAM_CELDA))
+
 def actualizar_botones(boton_hover=None):
     """Actualiza el tamaño de los botones según el hover"""
     for texto, (x, y) in posiciones_botones.items():
@@ -78,19 +81,54 @@ def dibujar_botones(boton_hover=None):
         texto_render = fuente.render(texto, True, NEGRO)
         texto_rect = texto_render.get_rect(center=rect.center)
         pantalla.blit(texto_render, texto_rect)
+def es_barco_hundido(barcos_info, disparos, fila, col):
+    hundido = False
+    for barco in barcos_info:
+        if (fila, col) in barco["posiciones"]:
+            hundido = True
+            for f, c in barco["posiciones"]:
+                if disparos[f][c] != 2:
+                    hundido = False
+                    break
+    return hundido
 
 def detectar_hover(pos):
     """Detecta qué botón está bajo el cursor"""
+    resultado = None
     for texto, rect in botones.items():
         if rect.collidepoint(pos):
-            return texto
-    return None
+            resultado = texto
+            break
+    return resultado
 
 def detectar_click(pos):
+    resultado = None
     for texto, rect in botones.items():
         if rect.collidepoint(pos):
-            return texto
-    return None
+            resultado = texto
+            break
+    return resultado
+
+def obtener_celda_clic(x, y):
+    FILAS, COLUMNAS = 10, 10
+    TAM_CELDA = 40
+    margen_x = (ANCHO - (COLUMNAS * TAM_CELDA)) // 2
+    margen_y = (ALTO - (FILAS * TAM_CELDA)) // 2
+    resultado = []
+    if margen_x <= x < margen_x + COLUMNAS * TAM_CELDA and margen_y <= y < margen_y + FILAS * TAM_CELDA:
+        col = (x - margen_x) // TAM_CELDA
+        fila = (y - margen_y) // TAM_CELDA
+        resultado = [int(fila), int(col)]
+    return resultado
+def dibujar_cuadricula():
+    margen_x = (ANCHO - (COLUMNAS * TAM_CELDA)) // 2
+    margen_y = (ALTO - (FILAS * TAM_CELDA)) // 2
+    for i in range(10):
+        for j in range(10):
+            if disparos[i][j] == 2:  # Tocado
+                pg.draw.circle(pantalla, (255,0,0), (margen_x + j*TAM_CELDA + TAM_CELDA//2, margen_y + i*TAM_CELDA + TAM_CELDA//2), 10)
+            elif disparos[i][j] == 3:  # Agua
+                pg.draw.circle(pantalla, (0,0,255), (margen_x + j*TAM_CELDA + TAM_CELDA//2, margen_y + i*TAM_CELDA + TAM_CELDA//2), 10)
 
 # Inicializar botones con tamaño normal
 actualizar_botones()
@@ -98,6 +136,7 @@ actualizar_botones()
 # Bucle principal
 corriendo = True
 estado="menu"
+puntaje = 0
 while corriendo:
     pos_mouse = pg.mouse.get_pos()
     boton_hover = detectar_hover(pos_mouse)
@@ -111,19 +150,42 @@ while corriendo:
             if clic == "Exit":
                 corriendo = False
             elif clic == "Play":
+                tablero = punto_a.inicializar_matriz(10, 10, 0)
+                disparos = punto_a.inicializar_matriz(10, 10, 0)
+                barcos = [1, 1, 1, 1, 2, 2, 2, 3, 3, 4]
+                barcos_info = []
+                punto_a.colocar_barcos(tablero, barcos, barcos_info)
                 estado= "game"
                 print("Starting game...")
             elif clic == "Level":
                 print("Selecting level...")
             elif clic == "Scores":
                 print("Showing scores...")
+        elif evento.type == pg.MOUSEBUTTONDOWN and estado == "game":
+            fila_col = obtener_celda_clic(*evento.pos)
+            if fila_col:
+                if fila_col[0] is not None and fila_col[1] is not None:
+                    if tablero[fila_col[0]][fila_col[1]] == 1 and disparos[fila_col[0]][fila_col[1]] == 0:
+                        disparos[fila_col[0]][fila_col[1]] = 2
+                        if es_barco_hundido(barcos_info, disparos, fila_col[0], fila_col[1]):
+                            print("barco Hundido!")
+                            puntaje += 10
+                        else:
+                            print("Tocado")
+                        
+                        puntaje+= 5 
+                    elif tablero[fila_col[0]][fila_col[1]] == 0 and disparos[fila_col[0]][fila_col[1]] == 0:
+                        print("Agua")
+                        puntaje-= 1
+                        disparos[fila_col[0]][fila_col[1]] = 3
     if estado=="menu":     
         pantalla.blit(fondo, (0, 0))
         actualizar_botones(boton_hover)
         dibujar_botones(boton_hover)
     elif estado == "game":
         pantalla.fill(CELESTE)
-        dibujar_cuadricula()
+        dibujar_matriz(FILAS, COLUMNAS,TAM_CELDA, ANCHO, ALTO)
+        dibujar_cuadricula() 
     pg.display.flip()
 pg.quit()
 sys.exit()
