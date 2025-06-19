@@ -47,9 +47,15 @@ posiciones_botones = {
     "Mute" : (50, 30),
 }
 
+posiciones_botones_juego = {
+    "Restart" : (300, 520),
+    "Back" : (550, 520)
+}
 
 # Diccionario para guardar los rectángulos actuales
 botones = {}
+botones_juego = {}
+
 def dibujar_matriz(filas, columnas, TAM_CELDA,Ancho, Alto):
     margen_x = (Ancho - (columnas * TAM_CELDA)) // 2
     margen_y = (Alto - (filas * TAM_CELDA)) // 2
@@ -70,9 +76,26 @@ def actualizar_botones(boton_hover=None):
         else:
             # Tamaño normal
             botones[texto] = pg.Rect(x, y, TAMANO_NORMAL[0], TAMANO_NORMAL[1])
+
+def actualizar_botones_juego(boton_hover=None):
+    """Actualiza el tamaño de los botones según el hover"""
+    for texto, pos in posiciones_botones_juego.items():
+        x, y = pos
+        if texto == boton_hover:
+            # Tamaño aumentado (centrado)
+            botones_juego[texto] = pg.Rect(
+                x - (TAMANO_GRANDE[0] - TAMANO_NORMAL[0]) // 2,
+                y - (TAMANO_GRANDE[1] - TAMANO_NORMAL[1]) // 2,
+                TAMANO_GRANDE[0], TAMANO_GRANDE[1])
+        else:
+            # Tamaño normal
+            botones_juego[texto] = pg.Rect(x, y, TAMANO_NORMAL[0], TAMANO_NORMAL[1])
+
+
 def dibujar_botones(boton_hover=None):
     """Dibuja los botones rectangulares con texto que crece"""
     for texto, rect in botones.items():
+
         # Dibujar rectángulo
         color_del_boton= GRIS
         if texto == "Mute":
@@ -99,6 +122,17 @@ def dibujar_botones(boton_hover=None):
         texto_render = fuente.render(mostrar_texto, True, NEGRO)
         texto_rect = texto_render.get_rect(center=rect.center)
         pantalla.blit(texto_render, texto_rect)
+
+def dibujar_botones_juego(boton_hover=None):
+    """Dibuja los botones rectangulares con texto que crece"""
+    for texto, rect in botones_juego.items():
+        color_del_boton= GRIS
+        pg.draw.rect(pantalla, color_del_boton, rect, border_radius= 25)
+        fuente = fuente_grande if texto == boton_hover else fuente_normal
+        texto_render = fuente.render(texto, True, NEGRO)
+        texto_rect = texto_render.get_rect(center=rect.center)
+        pantalla.blit(texto_render, texto_rect)
+
 def es_barco_hundido(barcos_info, disparos, fila, col):
     hundido = False
     for barco in barcos_info:
@@ -127,6 +161,23 @@ def detectar_click(pos):
             break
     return resultado
 
+def detectar_hover_juego(pos):
+    """Detecta qué botón está bajo el cursor"""
+    resultado = None
+    for texto, rect in botones_juego.items():
+        if rect.collidepoint(pos):
+            resultado = texto
+            break
+    return resultado
+
+def detectar_click_juego(pos):
+    resultado = None
+    for texto, rect in botones_juego.items():
+        if rect.collidepoint(pos):
+            resultado = texto
+            break
+    return resultado
+
 def obtener_celda_clic(x, y):
     FILAS, COLUMNAS = 10, 10
     TAM_CELDA = 40
@@ -138,6 +189,7 @@ def obtener_celda_clic(x, y):
         fila = (y - margen_y) // TAM_CELDA
         resultado = [int(fila), int(col)]
     return resultado
+
 def dibujar_cuadricula():
     margen_x = (ANCHO - (COLUMNAS * TAM_CELDA)) // 2
     margen_y = (ALTO - (FILAS * TAM_CELDA)) // 2
@@ -148,6 +200,16 @@ def dibujar_cuadricula():
             elif disparos[i][j] == 3:  # Agua
                 pg.draw.circle(pantalla, (0,0,255), (margen_x + j*TAM_CELDA + TAM_CELDA//2, margen_y + i*TAM_CELDA + TAM_CELDA//2), 10)
 
+
+def dibujar_botones_en_pantalla_juego(boton_restart, boton_back):
+    for texto, rect in botones.items():
+        pg.draw.rect(pantalla, (0, 200, 0), boton_restart)
+        fuente = pg.font.SysFont(None, 36)
+        texto = fuente.render("Reiniciar", True, (255, 255, 255))
+        texto_rect = texto.get_rect(center = boton_restart.center)
+        pantalla.blit(texto, texto_rect)
+
+
 # Inicializar botones con tamaño normal
 actualizar_botones()
 muteado = False
@@ -155,11 +217,13 @@ muteado = False
 corriendo = True
 estado="menu"
 puntaje = 0
+boton_restart = pg.Rect(50, 30, 150, 50)  
+
 while corriendo:
     pos_mouse = pg.mouse.get_pos()
     boton_hover = detectar_hover(pos_mouse)
+    boton_hover_juego = detectar_hover_juego(pos_mouse)
     
-         
     for evento in pg.event.get():
         if evento.type == pg.QUIT:
             corriendo = False
@@ -188,6 +252,19 @@ while corriendo:
                     pg.mixer.music.unpause()
                     print("Music unmuted")
         elif evento.type == pg.MOUSEBUTTONDOWN and estado == "game":
+            clic = detectar_click_juego(evento.pos)
+            if clic == "Restart":
+                tablero = punto_a.inicializar_matriz(10, 10, 0)
+                disparos = punto_a.inicializar_matriz(10, 10, 0)
+                barcos = [1, 1, 1, 1, 2, 2, 2, 3, 3, 4]
+                barcos_info = []
+                punto_a.colocar_barcos(tablero, barcos, barcos_info)
+                puntaje = 0
+                print("Game restarted")
+            elif clic == "Back":
+                estado = "menu"
+                puntaje = 0
+                print("Volver al menú")
             fila_col = obtener_celda_clic(*evento.pos)
             if fila_col:
                 if fila_col[0] is not None and fila_col[1] is not None:
@@ -212,6 +289,12 @@ while corriendo:
         pantalla.fill(CELESTE)
         dibujar_matriz(FILAS, COLUMNAS,TAM_CELDA, ANCHO, ALTO)
         dibujar_cuadricula() 
+        botones_game = ["Restart", "Back"]
+        actualizar_botones_juego(boton_hover_juego)
+        dibujar_botones_juego(boton_hover_juego)
+
+    # Filtra el diccionario de botones para solo los de juego
+        
     pg.display.flip()
 pg.quit()
 sys.exit()
