@@ -25,7 +25,7 @@ fuente_grande = pg.font.Font("ka1.ttf", tamano_fuente_grande)
 # Música de fondo
 pg.mixer.music.load("Piratas del  caribe  cancion completa - android juegos.mp3")
 pg.mixer.music.play(-1)
-pg.mixer.music.set_volume(0.2)
+pg.mixer.music.set_volume(0.1)
 
 # Cargar imagen de fondo
 fondo = pg.image.load("SEA_BATTLE.PNG")
@@ -271,12 +271,17 @@ while corriendo:
                     if tablero[fila_col[0]][fila_col[1]] == 1 and disparos[fila_col[0]][fila_col[1]] == 0:
                         disparos[fila_col[0]][fila_col[1]] = 2
                         if es_barco_hundido(barcos_info, disparos, fila_col[0], fila_col[1]):
-                            print("barco Hundido!")
-                            puntaje += 10
+                            for barco in barcos_info:
+                                if (fila_col[0], fila_col[1]) in barco["posiciones"]:
+                                    tamaño_barco = len(barco["posiciones"])
+                                    puntaje += tamaño_barco * 10
+                                    print(f"Barco hundido de tamaño {tamaño_barco}! +{tamaño_barco*10} puntos")
+                                    break
                         else:
-                            print("Tocado")
-                        
+                            print("Tocado! +5 puntos")
+
                         puntaje += 5 
+
                     elif tablero[fila_col[0]][fila_col[1]] == 0 and disparos[fila_col[0]][fila_col[1]] == 0:
                         print("Agua")
                         puntaje -= 1
@@ -289,7 +294,15 @@ while corriendo:
         pantalla.fill(CELESTE)
         dibujar_matriz(FILAS, COLUMNAS,TAM_CELDA, ANCHO, ALTO)
         dibujar_cuadricula() 
-        botones_game = ["Restart", "Back"]
+        #botones_game = ["Restart", "Back"]
+        rect_score = pg.Rect(50, 30, 350, 50)
+        pg.draw.rect(pantalla, GRIS, rect_score)
+        fuente_score = pg.font.Font("ka1.ttf", 30)
+        texto_score = fuente_score.render(f"Score: {puntaje}", True, NEGRO)
+          # Renderiza el texto del puntaje
+        # Centra el texto en el rectángulo
+        texto_rect = texto_score.get_rect(center=rect_score.center)
+        pantalla.blit(texto_score, texto_rect)
         actualizar_botones_juego(boton_hover_juego)
         dibujar_botones_juego(boton_hover_juego)
 
