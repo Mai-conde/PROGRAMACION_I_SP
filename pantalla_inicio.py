@@ -65,7 +65,11 @@ def dibujar_matriz(filas, columnas, TAM_CELDA,Ancho, Alto):
         pg.draw.line(pantalla, NEGRO, (margen_x, margen_y + y * TAM_CELDA), (margen_x + columnas * TAM_CELDA, margen_y + y * TAM_CELDA))
 
 def actualizar_botones(boton_hover=None):
-    """Actualiza el tamaño de los botones según el hover"""
+    """objetivo: Actualizar el tamaño de los botones según el hover
+    
+    parametros:
+        botom_hover (opcional)
+    """
     for texto, (x, y) in posiciones_botones.items():
         if texto == boton_hover:
             # Tamaño aumentado (centrado)
@@ -209,6 +213,13 @@ def dibujar_botones_en_pantalla_juego(boton_restart, boton_back):
         texto_rect = texto.get_rect(center = boton_restart.center)
         pantalla.blit(texto, texto_rect)
 
+def todos_barcos_hundidos(barcos_info, disparos):
+    hundidos = True
+    for barco in barcos_info:
+        for f, c in barco["posiciones"]:
+            if disparos[f][c] != 2:
+                hundidos = False
+    return hundidos
 
 # Inicializar botones con tamaño normal
 actualizar_botones()
@@ -286,6 +297,23 @@ while corriendo:
                         print("Agua")
                         puntaje -= 1
                         disparos[fila_col[0]][fila_col[1]] = 3
+                if todos_barcos_hundidos(barcos_info, disparos):
+                    estado = "fin"
+                    print("¡Ganaste! Todos los barcos han sido hundidos.")
+        elif evento.type == pg.MOUSEBUTTONDOWN and estado == "fin":
+            # Puedes agregar aquí lógica para volver al menú o reiniciar
+            clic = detectar_click_juego(evento.pos)
+            if clic == "Back":
+                estado = "menu"
+                puntaje = 0
+            elif clic == "Restart":
+                tablero = punto_a.inicializar_matriz(10, 10, 0)
+                disparos = punto_a.inicializar_matriz(10, 10, 0)
+                barcos = [1, 1, 1, 1, 2, 2, 2, 3, 3, 4]
+                barcos_info = []
+                punto_a.colocar_barcos(tablero, barcos, barcos_info)
+                puntaje = 0
+                estado = "game"            
     if estado=="menu":     
         pantalla.blit(fondo, (0, 0))
         actualizar_botones(boton_hover)
@@ -305,8 +333,25 @@ while corriendo:
         pantalla.blit(texto_score, texto_rect)
         actualizar_botones_juego(boton_hover_juego)
         dibujar_botones_juego(boton_hover_juego)
-
-    # Filtra el diccionario de botones para solo los de juego
+        YELLOW = (0,255,255)
+        '''if todos_barcos_hundidos(barcos_info, disparos):
+            rect_win = pg.Rect(250, 30, 350, 50)
+            pg.draw.rect(pantalla, YELLOW , rect_win)
+            fuente_win = pg.font.Font("ka1.ttf", 30)
+            texto_win = fuente_win.render(f"You Win! Score: {puntaje}", True, NEGRO)
+            pantalla.blit(texto_win, texto_rect)
+            pg.display.flip()'''
+    elif estado == "fin":
+        pantalla.fill(CELESTE)
+        rect_win = pg.Rect(150, 200, 600, 100)
+        pg.draw.rect(pantalla, (255, 255, 0), rect_win, border_radius=20)
+        fuente_win = pg.font.Font("ka1.ttf", 35)
+        texto_win = fuente_win.render(f"You Win! Score: {puntaje}", True, NEGRO)
+        texto_rect = texto_win.get_rect(center=rect_win.center)
+        pantalla.blit(texto_win, texto_rect)
+        # Dibuja los botones de juego para permitir volver o reiniciar
+        actualizar_botones_juego(boton_hover_juego)
+        dibujar_botones_juego(boton_hover_juego)
         
     pg.display.flip()
 pg.quit()
