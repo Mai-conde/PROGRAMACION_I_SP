@@ -19,16 +19,16 @@ CELESTE= (135, 206, 235)
 # Fuentes
 tamano_fuente_normal = 30
 tamano_fuente_grande = 40  # Texto más grande para el hover
-fuente_normal = pg.font.Font("C:/Users/kumae/Desktop/Segundo_parcial-main/ka1.ttf", tamano_fuente_normal)
-fuente_grande = pg.font.Font("C:/Users/kumae/Desktop/Segundo_parcial-main/ka1.ttf", tamano_fuente_grande)
+fuente_normal = pg.font.Font("ka1.ttf", tamano_fuente_normal)
+fuente_grande = pg.font.Font("ka1.ttf", tamano_fuente_grande)
 
 # Música de fondo
-pg.mixer.music.load("C:/Users/kumae/Desktop/Segundo_parcial-main/Piratas del  caribe  cancion completa - android juegos.mp3")
+pg.mixer.music.load("Piratas del  caribe  cancion completa - android juegos.mp3")
 pg.mixer.music.play(-1)
-pg.mixer.music.set_volume(0.4)
+pg.mixer.music.set_volume(0.2)
 
 # Cargar imagen de fondo
-fondo = pg.image.load("C:/Users/kumae/Desktop/Segundo_parcial-main/SEA_BATTLE.PNG")
+fondo = pg.image.load("SEA_BATTLE.PNG")
 fondo = pg.transform.scale(fondo, (ANCHO, ALTO))
 
 # Tamaños de botones (rectangulares)
@@ -40,9 +40,9 @@ posiciones_botones = {
     "Level": (300, 150),
     "Play": (300, 230),
     "Scores": (300, 310),
-    "Exit": (300, 390)
+    "Exit": (300, 390),
+    "Mute" : (50, 30),
 }
-
 # Diccionario para guardar los rectángulos actuales
 botones = {}
 def dibujar_cuadricula():
@@ -71,11 +71,36 @@ def dibujar_botones(boton_hover=None):
     """Dibuja los botones rectangulares con texto que crece"""
     for texto, rect in botones.items():
         # Dibujar rectángulo
-        pg.draw.rect(pantalla, GRIS, rect)
-        
+        color_del_boton= GRIS
+        if texto == "Mute":
+            if muteado:
+                mostrar_texto = "Unmute"
+                color_del_boton= (220,50,50)
+            else:
+                mostrar_texto = "Mute"
+        else:
+            mostrar_texto = texto
+        if texto == boton_hover:
+            fuente = fuente_grande
+        else:
+            fuente = fuente_normal
+        pg.draw.rect(pantalla, color_del_boton, rect, border_radius= 25)
+        if texto == "Mute" and muteado:
+            """pg.draw.line(
+                pantalla, NEGRO,
+                (rect.right - 10, rect.bottom - 10),
+                (rect.left + 10, rect.top + 10),
+                3
+            )
+            """
+            pg.draw.line(
+                pantalla, NEGRO,
+                (rect.right - 10, rect.top + 10),
+                (rect.left + 10, rect.bottom - 10),
+                3
+            )
         # Seleccionar fuente según hover
-        fuente = fuente_grande if texto == boton_hover else fuente_normal
-        texto_render = fuente.render(texto, True, NEGRO)
+        texto_render = fuente.render(mostrar_texto, True, NEGRO)
         texto_rect = texto_render.get_rect(center=rect.center)
         pantalla.blit(texto_render, texto_rect)
 
@@ -95,6 +120,7 @@ def detectar_click(pos):
 # Inicializar botones con tamaño normal
 actualizar_botones()
 
+muteado= False
 # Bucle principal
 corriendo = True
 estado="menu"
@@ -117,6 +143,14 @@ while corriendo:
                 print("Selecting level...")
             elif clic == "Scores":
                 print("Showing scores...")
+            elif clic == "Mute" or clic == "Unmute":
+                muteado = not muteado
+                if muteado:
+                    pg.mixer.music.pause()
+                    print("Music muted")
+                else:
+                    pg.mixer.music.unpause()
+                    print("Music unmuted")
     if estado=="menu":     
         pantalla.blit(fondo, (0, 0))
         actualizar_botones(boton_hover)
