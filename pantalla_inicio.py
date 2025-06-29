@@ -68,7 +68,6 @@ while corriendo[0]:
             eventos_menu(evento, botones, muteado, corriendo, estado, cargar_puntajes, puntajes_guardados)
             # Si el usuario hace clic en "Play", inicializa el juego aquí:
             if estado[0] == "play":
-                nivel_actual[0] = "Easy"
                 config = configurar_nivel(nivel_actual[0])
                 FILAS = config["FILAS"]
                 COLUMNAS = config["COLUMNAS"]
@@ -125,6 +124,7 @@ while corriendo[0]:
 
     # Renderizado de pantallas según el estado
     if estado[0] == "menu":
+        nivel_actual[0] = "Easy"
         pantalla_menu(
             pantalla, fondo, botones, fuente_normal, fuente_grande,
             boton_hover, muteado[0], posiciones_botones,
@@ -152,6 +152,7 @@ while corriendo[0]:
             TAMANO_NORMAL, TAMANO_GRANDE
         )
     elif estado[0] == "scores":
+        puntajes_guardados[0] = cargar_puntajes()
         pantalla_scores(pantalla, puntajes_guardados[0])
         
     
