@@ -11,30 +11,21 @@ from src.eventos import (eventos_menu, eventos_levels, eventos_scores,eventos_ga
 pg.init()
 
 # Configuración de pantalla
-
 pantalla = pg.display.set_mode((ANCHO, ALTO))
 pg.display.set_caption("Pantalla de Inicio")
-
 # Colores
-
 # Fuentes
 fondo = cargar_imagenes()
 fuente_normal, fuente_grande = cargar_fuentes()
 sonido_barco, sonido_agua, sonido_hundido = cargar_sonidos()
 pg.mixer.music.play(-1)
-
-
 botones_niveles = {}
-
-
 boton_hover = None
 # Diccionario para guardar los rectángulos actuales
 botones = {}
 botones_juego = {}
-
 # Inicializar botones with tamaño normal
 actualizar_botones(botones, posiciones_botones, TAMANO_NORMAL, TAMANO_GRANDE, boton_hover)
-
 # Variables mutables como listas de un solo elemento
 corriendo = [True]
 estado = ["menu"]
@@ -43,18 +34,11 @@ nombre_jugador = [""]
 nivel_actual = ["Easy"]
 puntajes_guardados = [None]
 muteado = [False]
-
 # Variables de tablero y juego inicializadas vacías o con valores por defecto
 FILAS = 0
 COLUMNAS = 0
 TAM_CELDA = 0
-barcos = []
-tablero = []
-disparos = []
-barcos_info = []
-
-
-
+barcos = []   
 # Bucle principal
 while corriendo[0]:
     pos_mouse = pg.mouse.get_pos()
@@ -63,7 +47,7 @@ while corriendo[0]:
 
     for evento in pg.event.get():
         if evento.type == pg.QUIT:
-            corriendo[0] = False
+            pass
         elif estado[0] == "menu":
             eventos_menu(evento, botones, muteado, corriendo, estado, cargar_puntajes, puntajes_guardados)
             # Si el usuario hace clic en "Play", inicializa el juego aquí:
@@ -147,9 +131,9 @@ while corriendo[0]:
         pantalla_nombre(pantalla, nombre_jugador[0])
     elif estado[0] == "fin":
         pantalla_fin(
-            pantalla, puntaje[0], botones_juego, posiciones_botones_juego,
-            fuente_normal, fuente_grande, boton_hover_juego,
-            TAMANO_NORMAL, TAMANO_GRANDE
+        pantalla, puntaje[0], botones_juego, posiciones_botones_juego,
+        fuente_normal, fuente_grande, boton_hover_juego,
+        TAMANO_NORMAL_JUEGO, TAMANO_GRANDE_JUEGO
         )
     elif estado[0] == "scores":
         puntajes_guardados[0] = cargar_puntajes()

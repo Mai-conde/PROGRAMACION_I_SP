@@ -8,7 +8,7 @@ TAMANO_NORMAL = (200, 50)
 TAMANO_GRANDE = (250, 70)
 barcos = [1, 1, 1, 1, 2, 2, 2, 3, 3, 4]
 posiciones_botones_juego = {
-    "Restart" : (15,10) ,
+    "Restart" : (30,12) ,
     "Back" : (670, 10),
 }
 posiciones_botones_niveles = {
@@ -24,3 +24,6 @@ posiciones_botones = {
     "Exit": (300, 390),
     "Mute" : (50, 30),
 }
+
+TAMANO_NORMAL_JUEGO = (100, 35)
+TAMANO_GRANDE_JUEGO = (130, 50)

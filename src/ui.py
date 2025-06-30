@@ -331,7 +331,7 @@ def pantalla_scores(pantalla: pg.Surface, puntajes_guardados: list) -> None:
     pantalla.fill(CELESTE)
     fuente_titulo = pg.font.Font("static/font/ka1.ttf", 36)
     fuente_score = pg.font.Font("static/font/ka1.ttf", 24)
-    texto = fuente_titulo.render("Puntajes", True, NEGRO)
+    texto = fuente_titulo.render("Scores", True, NEGRO)
     pantalla.blit(texto, (320, 50))
     y = 120
     puntajes_ordenados = puntajes_guardados[:]
