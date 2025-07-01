@@ -1,6 +1,6 @@
 import pygame as pg
 from src.utils import detectar_click, obtener_celda_clic
-from src.tablero_barcos import es_barco_hundido, todos_barcos_hundidos
+from src.tablero_barcos import es_barco_hundido, todos_barcos_hundidos, obtener_barco_hundido
 from src.scores import guardar_puntaje
 
 def eventos_menu(evento: pg.event.Event, botones: dict, muteado: list, corriendo: list, estado: list, cargar_puntajes: callable, puntajes_guardados: list) -> None:
@@ -88,10 +88,11 @@ def eventos_game(evento: pg.event.Event, botones_juego: dict, estado: list, punt
         ANCHO (int): Ancho de la ventana.
         ALTO (int): Alto de la ventana.
     """
+
     if evento.type == pg.MOUSEBUTTONDOWN:
         clic = detectar_click(evento.pos, botones_juego)
         if clic == "Restart":
-            return "restart"
+            estado[0] = "game"          
         elif clic == "Back":
             estado[0] = "menu"
             puntaje[0] = 0
@@ -117,6 +118,7 @@ def eventos_game(evento: pg.event.Event, botones_juego: dict, estado: list, punt
                     sonido_agua.play()
                     puntaje[0] -= 1
                     disparos[f][c] = 3
+
 
 def eventos_nombre(evento: pg.event.Event, nombre_jugador: list, estado: list) -> None:
     """
@@ -157,19 +159,3 @@ def eventos_fin(evento: pg.event.Event, botones_juego: dict, estado: list, punta
         elif clic == "Restart":
             return "restart"
 
-def obtener_barco_hundido(barcos_info: list, filas: int, columnas: int) -> dict:
-    """
-    Devuelve el barco al que pertenece la celda (f, c).
-
-    Args:
-        barcos_info (list): Información de los barcos.
-        f (int): Fila.
-        c (int): Columna.
-
-    Returns:
-        dict or None: Diccionario del barco si se encuentra, None si no.
-    """
-    for barco in barcos_info:
-        if (filas, columnas) in barco["posiciones"]:
-            return barco
-    return None

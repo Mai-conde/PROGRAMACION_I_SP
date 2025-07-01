@@ -149,4 +149,20 @@ def todos_barcos_hundidos(barcos_info: list, disparos: list) -> bool:
     return hundidos
 
 
+def obtener_barco_hundido(barcos_info: list, filas: int, columnas: int) -> dict:
+    """
+    Devuelve el barco al que pertenece la celda (f, c).
 
+    Args:
+        barcos_info (list): Información de los barcos.
+        f (int): Fila.
+        c (int): Columna.
+
+    Returns:
+        dict or None: Diccionario del barco si se encuentra, None si no.
+    """
+    retorno=None
+    for barco in barcos_info:
+        if (filas, columnas) in barco["posiciones"]:
+            retorno = barco
+    return retorno

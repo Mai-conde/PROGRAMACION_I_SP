@@ -87,7 +87,7 @@ while corriendo[0]:
                 mostrar_matriz(tablero)
                 print("Barcos info:", barcos_info)
         elif estado[0] == "scores":
-            eventos_scores(evento, botones_scores, estado)  # <-- Pasa botones_scores si tu función lo requiere
+            eventos_scores(evento, botones_scores, estado)  
         elif estado[0] == "game":
             res = eventos_game(evento, botones_juego, estado, puntaje, nombre_jugador, tablero, disparos, barcos_info, sonido_barco, sonido_agua, sonido_hundido, FILAS, COLUMNAS, TAM_CELDA, ANCHO, ALTO)
             if res == "restart":
