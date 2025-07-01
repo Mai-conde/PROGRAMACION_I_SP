@@ -7,7 +7,7 @@ def cargar_puntajes()-> list:
     Returns:
         list: Lista de diccionarios con los puntajes guardados.
     """
-    archivo = "data/scores.json"
+    archivo = "PROGRAMACION_I_SP/data/scores.json"
     datos = []
     if os.path.exists(archivo):
         with open(archivo, "r", encoding="utf-8") as f:
@@ -23,7 +23,7 @@ def guardar_puntaje(nombre: str, puntaje: int) -> None:
         nombre (str): Nombre del jugador.
         puntaje (int): Puntaje obtenido.
     """
-    archivo = "data/scores.json"
+    archivo = "PROGRAMACION_I_SP/data/scores.json"
     datos = []
     if os.path.exists(archivo):
         with open(archivo, "r", encoding="utf-8") as f:

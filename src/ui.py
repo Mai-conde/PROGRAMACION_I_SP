@@ -248,7 +248,7 @@ def pantalla_game(pantalla: pg.Surface, FILAS: int, COLUMNAS: int, TAM_CELDA: in
     dibujar_cuadricula(pantalla, disparos, FILAS, COLUMNAS, TAM_CELDA, ANCHO, ALTO)
     rect_score = pg.Rect(300, 555, 250, 40)
     pg.draw.rect(pantalla, GRIS, rect_score)
-    fuente_score = pg.font.Font("static/font/ka1.ttf", 30)
+    fuente_score = pg.font.Font("PROGRAMACION_I_SP/static/font/ka1.ttf", 30)
     texto_score = fuente_score.render(f"Score: {puntaje}", True, NEGRO)
     texto_rect = texto_score.get_rect(center=rect_score.center)
     pantalla.blit(texto_score, texto_rect)
@@ -284,15 +284,15 @@ def pantalla_nombre(pantalla: pg.Surface, nombre_jugador: str) -> None:
         nombre_jugador (str): Nombre ingresado por el usuario (se muestra en el campo de texto).
     """
     pantalla.fill(CELESTE)
-    fuente = pg.font.Font("static/font/ka1.ttf", 32)
+    fuente = pg.font.Font("PROGRAMACION_I_SP/static/font/ka1.ttf", 32)
     texto = fuente.render("Ingresa tu nombre:", True, NEGRO)
     pantalla.blit(texto, (220, 200))
     rect_input = pg.Rect(220, 260, 360, 50)
     pg.draw.rect(pantalla, BLANCO, rect_input, border_radius=10)
-    fuente_input = pg.font.Font("static/font/ka1.ttf", 28)
+    fuente_input = pg.font.Font("PROGRAMACION_I_SP/static/font/ka1.ttf", 28)
     texto_input = fuente_input.render(nombre_jugador, True, NEGRO)
     pantalla.blit(texto_input, (rect_input.x + 10, rect_input.y + 10))
-    fuente_inst = pg.font.Font("static/font/ka1.ttf", 20)
+    fuente_inst = pg.font.Font("PROGRAMACION_I_SP/static/font/ka1.ttf", 20)
     texto_inst = fuente_inst.render("Presiona Enter para continuar", True, NEGRO)
     pantalla.blit(texto_inst, (rect_input.x, rect_input.y + 60))
 
@@ -314,7 +314,7 @@ def pantalla_fin(pantalla: pg.Surface, puntaje: int, botones_juego: dict, posici
     pantalla.fill(CELESTE)
     rect_win = pg.Rect(150, 200, 600, 100)
     pg.draw.rect(pantalla, (255, 255, 0), rect_win, border_radius=20)
-    fuente_win = pg.font.Font("static/font/ka1.ttf", 35)
+    fuente_win = pg.font.Font("PROGRAMACION_I_SP/static/font/ka1.ttf", 35)
     texto_win = fuente_win.render(f"You Win! Score: {puntaje}", True, NEGRO)
     texto_rect = texto_win.get_rect(center=rect_win.center)
     pantalla.blit(texto_win, texto_rect)
@@ -330,8 +330,8 @@ def pantalla_scores(pantalla: pg.Surface, puntajes_guardados: list, botones_scor
         puntajes_guardados (list): Lista de diccionarios con los puntajes y nombres.
     """
     pantalla.fill(CELESTE)
-    fuente_titulo = pg.font.Font("static/font/ka1.ttf", 36)
-    fuente_score = pg.font.Font("static/font/ka1.ttf", 24)
+    fuente_titulo = pg.font.Font("PROGRAMACION_I_SP/static/font/ka1.ttf", 36)
+    fuente_score = pg.font.Font("PROGRAMACION_I_SP/static/font/ka1.ttf", 24)
     texto = fuente_titulo.render("Scores", True, NEGRO)
     pantalla.blit(texto, (320, 50))
     y = 120
@@ -349,7 +349,7 @@ def pantalla_scores(pantalla: pg.Surface, puntajes_guardados: list, botones_scor
         y += 35
     rect_back = pg.Rect(50, 30, 120, 40)
     pg.draw.rect(pantalla, GRIS, rect_back, border_radius=15)
-    fuente_back = pg.font.Font("static/font/ka1.ttf", 22)
+    fuente_back = pg.font.Font("PROGRAMACION_I_SP/static/font/ka1.ttf", 22)
     texto_back = fuente_back.render("Back", True, NEGRO)
     pantalla.blit(texto_back, (rect_back.x + 30, rect_back.y + 8))
     actualizar_botones(botones_scores, posiciones_botones_scores, TAMAÑO_NORMAL, TAMAÑO_GRANDE, boton_hover_scores)

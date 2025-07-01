@@ -7,6 +7,7 @@ ALTO = 600
 TAMAÑO_NORMAL = (200, 50)
 TAMAÑO_GRANDE = (250, 70)
 barcos = [1, 1, 1, 1, 2, 2, 2, 3, 3, 4]
+
 posiciones_botones_juego = {
     "Restart" : (30,12) ,
     "Back" : (670, 10),

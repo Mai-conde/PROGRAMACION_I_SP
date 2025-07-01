@@ -51,6 +51,7 @@ while corriendo[0]:
     for evento in pg.event.get():
         if evento.type == pg.QUIT:
             pass
+
         elif estado[0] == "menu":
             eventos_menu(evento, botones, muteado, corriendo, estado, cargar_puntajes, puntajes_guardados)
             # Si el usuario hace clic en "Play", inicializa el juego aquí:
@@ -70,6 +71,7 @@ while corriendo[0]:
                 puntaje[0] = 0
                 nombre_jugador[0] = ""
                 estado[0] = "nombre"
+
         elif estado[0] == "levels":
             eventos_levels(evento, botones_niveles, estado, nivel_actual)
             # Si el usuario elige un nivel, inicializa el juego aquí:
@@ -86,8 +88,10 @@ while corriendo[0]:
                 print("Matriz de barcos:")
                 mostrar_matriz(tablero)
                 print("Barcos info:", barcos_info)
+
         elif estado[0] == "scores":
             eventos_scores(evento, botones_scores, estado)  
+
         elif estado[0] == "game":
             res = eventos_game(evento, botones_juego, estado, puntaje, nombre_jugador, tablero, disparos, barcos_info, sonido_barco, sonido_agua, sonido_hundido, FILAS, COLUMNAS, TAM_CELDA, ANCHO, ALTO)
             if res == "restart":
@@ -96,8 +100,10 @@ while corriendo[0]:
                 barcos_info = []
                 colocar_barcos(tablero, barcos, barcos_info)
                 puntaje[0] = 0
+
         elif estado[0] == "nombre":
             eventos_nombre(evento, nombre_jugador, estado)
+            
         elif estado[0] == "fin":
             res = eventos_fin(evento, botones_juego, estado, puntaje, nombre_jugador)
             if res == "restart":

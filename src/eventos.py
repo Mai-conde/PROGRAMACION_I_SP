@@ -104,10 +104,13 @@ def eventos_game(evento: pg.event.Event, botones_juego: dict, estado: list, punt
                 if tablero[f][c] == 1 and disparos[f][c] == 0:
                     sonido_barco.play()
                     disparos[f][c] = 2
-                    puntaje[0] += 5  # Suma puntos por acertar
+                    puntaje[0] += 5  
                     if es_barco_hundido(barcos_info, disparos, f, c):
                         sonido_hundido.play()
-                        puntaje[0] += 10
+                        for barco in barcos_info:
+                            if (fila_col[0], fila_col[1]) in barco["posiciones"]:
+                                tamaño_barco = len(barco["posiciones"])
+                                puntaje[0] += tamaño_barco * 10
                         barco = obtener_barco_hundido(barcos_info, f, c)
                         if barco:
                             print("¡Barco hundido!", barco["posiciones"])
