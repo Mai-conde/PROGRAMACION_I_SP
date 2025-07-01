@@ -52,17 +52,18 @@ def eventos_levels(evento: pg.event.Event, botones_niveles: dict, estado: list, 
             nivel_actual[0] = clic
             estado[0] = "nombre"
 
-def eventos_scores(evento: pg.event.Event, estado: list) -> None:
+def eventos_scores(evento: pg.event.Event, botones_scores: dict, estado: list) -> None:
     """
     Maneja los eventos de la pantalla de puntajes.
 
     Args:
         evento: Evento de pygame.
+        botones_scores (dict): Diccionario de botones de scores.
         estado (list): Estado actual del juego [str].
     """
     if evento.type == pg.MOUSEBUTTONDOWN:
-        rect_back = pg.Rect(50, 30, 120, 40)
-        if rect_back.collidepoint(evento.pos):
+        clic = detectar_click(evento.pos, botones_scores)
+        if clic == "Back":
             estado[0] = "menu"
 
 def eventos_game(evento: pg.event.Event, botones_juego: dict, estado: list, puntaje: list, nombre_jugador: list, tablero: list, disparos: list, barcos_info: list, sonido_barco, sonido_agua, sonido_hundido, FILAS: int, COLUMNAS: int, TAM_CELDA: int, ANCHO: int, ALTO: int) -> None:

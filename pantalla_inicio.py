@@ -1,9 +1,9 @@
 import pygame as pg
 import sys
-from src.scores import guardar_puntaje, cargar_puntajes
-from src.tablero_barcos import (inicializar_matriz,colocar_barcos,es_barco_hundido,todos_barcos_hundidos, mostrar_matriz)
+from src.scores import cargar_puntajes
+from src.tablero_barcos import (inicializar_matriz,colocar_barcos,mostrar_matriz)
 from src.const import *
-from src.utils import (detectar_click,detectar_hover,obtener_celda_clic)
+from src.utils import (detectar_hover)
 from src.seteo_de_juego import configurar_nivel
 from src.ui import (pantalla_menu, pantalla_game, pantalla_levels,pantalla_nombre, pantalla_fin, pantalla_scores,actualizar_botones)
 from src.recursos import cargar_imagenes, cargar_fuentes, cargar_sonidos
@@ -13,8 +13,7 @@ pg.init()
 # Configuración de pantalla
 pantalla = pg.display.set_mode((ANCHO, ALTO))
 pg.display.set_caption("Pantalla de Inicio")
-# Colores
-# Fuentes
+
 fondo = cargar_imagenes()
 fuente_normal, fuente_grande = cargar_fuentes()
 sonido_barco, sonido_agua, sonido_hundido = cargar_sonidos()
@@ -24,8 +23,11 @@ boton_hover = None
 # Diccionario para guardar los rectángulos actuales
 botones = {}
 botones_juego = {}
+botones_scores = {}
+from src.const import posiciones_boton_scores, TAMAÑO_NORMAL, TAMAÑO_GRANDE
+
 # Inicializar botones with tamaño normal
-actualizar_botones(botones, posiciones_botones, TAMANO_NORMAL, TAMANO_GRANDE, boton_hover)
+actualizar_botones(botones, posiciones_botones, TAMAÑO_NORMAL, TAMAÑO_GRANDE, boton_hover)
 # Variables mutables como listas de un solo elemento
 corriendo = [True]
 estado = ["menu"]
@@ -34,16 +36,17 @@ nombre_jugador = [""]
 nivel_actual = ["Easy"]
 puntajes_guardados = [None]
 muteado = [False]
-# Variables de tablero y juego inicializadas vacías o con valores por defecto
+
 FILAS = 0
 COLUMNAS = 0
 TAM_CELDA = 0
-barcos = []   
-# Bucle principal
+barcos = []
+
 while corriendo[0]:
     pos_mouse = pg.mouse.get_pos()
     boton_hover = detectar_hover(pos_mouse, botones)
     boton_hover_juego = detectar_hover(pos_mouse, botones_juego)
+    boton_hover_scores = detectar_hover(pos_mouse, botones_scores)  # <-- Agrega esto
 
     for evento in pg.event.get():
         if evento.type == pg.QUIT:
@@ -84,7 +87,7 @@ while corriendo[0]:
                 mostrar_matriz(tablero)
                 print("Barcos info:", barcos_info)
         elif estado[0] == "scores":
-            eventos_scores(evento, estado)
+            eventos_scores(evento, botones_scores, estado)  # <-- Pasa botones_scores si tu función lo requiere
         elif estado[0] == "game":
             res = eventos_game(evento, botones_juego, estado, puntaje, nombre_jugador, tablero, disparos, barcos_info, sonido_barco, sonido_agua, sonido_hundido, FILAS, COLUMNAS, TAM_CELDA, ANCHO, ALTO)
             if res == "restart":
@@ -112,7 +115,7 @@ while corriendo[0]:
         pantalla_menu(
             pantalla, fondo, botones, fuente_normal, fuente_grande,
             boton_hover, muteado[0], posiciones_botones,
-            TAMANO_NORMAL, TAMANO_GRANDE
+            TAMAÑO_NORMAL, TAMAÑO_GRANDE
         )
     elif estado[0] == "game":
         pantalla_game(
@@ -125,7 +128,7 @@ while corriendo[0]:
         pantalla_levels(
             pantalla, botones_niveles, posiciones_botones_niveles,
             fuente_normal, fuente_grande, boton_hover_niveles,
-            TAMANO_NORMAL, TAMANO_GRANDE
+            TAMAÑO_NORMAL, TAMAÑO_GRANDE
         )
     elif estado[0] == "nombre":
         pantalla_nombre(pantalla, nombre_jugador[0])
@@ -133,11 +136,16 @@ while corriendo[0]:
         pantalla_fin(
         pantalla, puntaje[0], botones_juego, posiciones_botones_juego,
         fuente_normal, fuente_grande, boton_hover_juego,
-        TAMANO_NORMAL_JUEGO, TAMANO_GRANDE_JUEGO
+        TAMAÑO_NORMAL_JUEGO, TAMAÑO_GRANDE_JUEGO
         )
     elif estado[0] == "scores":
         puntajes_guardados[0] = cargar_puntajes()
-        pantalla_scores(pantalla, puntajes_guardados[0])
+        # Actualiza y dibuja el botón Back con hover
+        actualizar_botones(botones_scores, posiciones_boton_scores, TAMAÑO_NORMAL, TAMAÑO_GRANDE, boton_hover_scores)
+        pantalla_scores(
+            pantalla, puntajes_guardados[0], botones_scores, posiciones_boton_scores,
+            fuente_normal, fuente_grande, boton_hover_scores
+        )
         
     
         

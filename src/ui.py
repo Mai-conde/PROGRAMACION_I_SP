@@ -1,5 +1,5 @@
 import pygame as pg
-from .const import BLANCO,GRIS,NEGRO,CELESTE,ANCHO,ALTO
+from .const import BLANCO,GRIS,NEGRO,CELESTE,TAMAÑO_GRANDE,TAMAÑO_NORMAL
 
 def dibujar_botones(pantalla: pg.Surface, botones: dict, fuente_normal: pg.font.Font, fuente_grande: pg.font.Font, boton_hover: str = None, muteado: bool = False) -> None:
     """
@@ -31,12 +31,7 @@ def dibujar_botones(pantalla: pg.Surface, botones: dict, fuente_normal: pg.font.
             fuente = fuente_normal
         pg.draw.rect(pantalla, color_del_boton, rect, border_radius= 25)
         if texto == "Mute" and muteado:
-            pg.draw.line(
-                pantalla, NEGRO,
-                (rect.right - 10, rect.top + 10),
-                (rect.left + 10, rect.bottom - 10),
-                3
-            )
+            pg.draw.line(pantalla, NEGRO,(rect.right - 10, rect.top + 10),(rect.left + 10, rect.bottom - 10),3)
         # Seleccionar fuente según hover
         texto_render = fuente.render(mostrar_texto, True, NEGRO)
         texto_rect = texto_render.get_rect(center=rect.center)
@@ -56,7 +51,10 @@ def dibujar_botones_juego(pantalla: pg.Surface, botones_juego: dict, fuente_norm
     for texto, rect in botones_juego.items():
         color_del_boton= GRIS
         pg.draw.rect(pantalla, color_del_boton, rect, border_radius= 25)
-        fuente = fuente_grande if texto == boton_hover else fuente_normal
+        if texto == boton_hover:
+            fuente = fuente_grande
+        else:
+            fuente = fuente_normal
         texto_render = fuente.render(texto, True, NEGRO)
         texto_rect = texto_render.get_rect(center=rect.center)
         pantalla.blit(texto_render, texto_rect)
@@ -74,7 +72,10 @@ def dibujar_botones_niveles(pantalla: pg.Surface, botones_niveles: dict, fuente_
     """
     for texto, rect in botones_niveles.items():
         pg.draw.rect(pantalla, GRIS, rect, border_radius=25)
-        fuente = fuente_grande if texto == boton_hover else fuente_normal
+        if texto == boton_hover:
+            fuente = fuente_grande
+        else:
+            fuente = fuente_normal
         texto_render = fuente.render(texto, True, NEGRO)
         texto_rect = texto_render.get_rect(center=rect.center)
         pantalla.blit(texto_render, texto_rect)
@@ -88,7 +89,7 @@ def dibujar_botones_en_pantalla_juego(pantalla: pg.Surface, botones: dict, boton
         botones (dict): Diccionario de botones.
         boton_restart: Rectángulo del botón de reinicio.
     """
-    for texto, rect in botones.items():
+    for texto, _ in botones.items():
         pg.draw.rect(pantalla, (0, 200, 0), boton_restart)
         fuente = pg.font.SysFont(None, 36)
         texto = fuente.render("Reiniciar", True, (255, 255, 255))
@@ -320,7 +321,7 @@ def pantalla_fin(pantalla: pg.Surface, puntaje: int, botones_juego: dict, posici
     actualizar_botones_juego(botones_juego, posiciones_botones_juego, TAMANO_NORMAL, TAMANO_GRANDE, boton_hover_juego)
     dibujar_botones_juego(pantalla, botones_juego, fuente_normal, fuente_grande, boton_hover_juego)
 
-def pantalla_scores(pantalla: pg.Surface, puntajes_guardados: list) -> None:
+def pantalla_scores(pantalla: pg.Surface, puntajes_guardados: list, botones_scores, posiciones_botones_scores, fuente_normal, fuente_grande, boton_hover_scores) -> None:
     """
     Dibuja la pantalla de puntajes guardados.
 
@@ -351,3 +352,5 @@ def pantalla_scores(pantalla: pg.Surface, puntajes_guardados: list) -> None:
     fuente_back = pg.font.Font("static/font/ka1.ttf", 22)
     texto_back = fuente_back.render("Back", True, NEGRO)
     pantalla.blit(texto_back, (rect_back.x + 30, rect_back.y + 8))
+    actualizar_botones(botones_scores, posiciones_botones_scores, TAMAÑO_NORMAL, TAMAÑO_GRANDE, boton_hover_scores)
+    dibujar_botones(pantalla, botones_scores, fuente_normal, fuente_grande, boton_hover_scores)

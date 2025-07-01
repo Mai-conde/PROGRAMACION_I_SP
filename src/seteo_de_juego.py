@@ -17,7 +17,7 @@ def configurar_nivel(nivel: str) -> dict:
     elif nivel == "Medium":
         FILAS = 20
         COLUMNAS = 20
-        TAM_CELDA = 25  # Ajusta el tamaño para que quepa en pantalla
+        TAM_CELDA = 25  
         barcos = [1, 1, 1, 1, 2, 2, 2, 3, 3, 4]*2
     elif nivel == "Hard":
         FILAS = 40
